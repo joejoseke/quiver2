@@ -1,0 +1,25 @@
+{
+"name": "brane-shop-backend",
+"version": "1.0.0",
+"description": "Online Shop Backend",
+"main": "src/worker.mjs",
+"scripts": {
+"start": "node server.js",
+"dev": "npx wrangler dev",
+"deploy": "npx wrangler deploy",
+    "d1:migrate:local": "npx wrangler d1 migrations apply db --local",
+    "d1:migrate:remote": "npx wrangler d1 migrations apply db --remote",
+"test": "node --check src/worker.mjs"
+},
+"keywords": [],
+"author": "",
+"license": "ISC",
+"type": "commonjs",
+"dependencies": {
+"cors": "^2.8.6",
+"dotenv": "^17.4.2",
+"express": "^5.2.1",
+"mysql2": "^3.22.6",
+"sqlite3": "^6.0.1"
+}
+}

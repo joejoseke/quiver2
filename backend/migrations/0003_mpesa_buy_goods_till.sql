@@ -1,0 +1,2 @@
+INSERT OR REPLACE INTO settings (key, value)
+VALUES ('MPESA_TILL_NUMBER', '8257594');

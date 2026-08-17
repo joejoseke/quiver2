@@ -1,0 +1,26 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "brane-shop-backend",
+  "main": "src/worker.mjs",
+  "compatibility_date": "2026-08-17",
+  "assets": {
+    "directory": "./uploads",
+    "binding": "ASSETS",
+    "run_worker_first": true
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "db",
+      "database_id": "89bcb680-ebb3-4be5-adf6-51c2bf6325f9"
+    }
+  ],
+  "vars": {
+    "APP_BASE_URL": "http://localhost:8787",
+    "FRONTEND_BASE_URL": "http://localhost:5173"
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  }
+}
