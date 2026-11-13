@@ -17,7 +17,9 @@
   ],
   "vars": {
     "APP_BASE_URL": "http://localhost:8787",
-    "FRONTEND_BASE_URL": "http://localhost:5173"
+    "FRONTEND_BASE_URL": "http://localhost:5173",
+    "MPESA_MODE": "n8n",
+    "N8N_STK_WEBHOOK": "https://connector.kaylan.digital/webhook/5f7141a7-399d-4722-b838-a3a615dt67UIo"
   },
   "observability": {
     "enabled": true,

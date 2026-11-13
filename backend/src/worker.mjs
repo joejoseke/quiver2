@@ -209,6 +209,34 @@ async function getMpesaToken(config) {
 }
 
 async function initiateMpesaSTKPush(env, request, { orderId, amount, phone, onMockPaid }) {
+  if (env.MPESA_MODE === 'n8n') {
+    if (!env.N8N_STK_WEBHOOK) {
+      throw new Error('N8N_STK_WEBHOOK is not configured for n8n relay mode.');
+    }
+    const formattedPhone = formatKenyanPhone(phone);
+    const relayResponse = await fetch(env.N8N_STK_WEBHOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        phone: formattedPhone,
+        amount: Math.round(amount),
+        ref: orderId.slice(0, 12),
+        desc: 'Brane Shop Purchase'
+      })
+    });
+    if (!relayResponse.ok) {
+      const errText = await relayResponse.text();
+      throw new Error(`n8n STK relay failed: ${relayResponse.status} ${errText}`);
+    }
+    const relayData = await relayResponse.json();
+    return {
+      CheckoutRequestID: relayData.checkoutRequestId || '',
+      CustomerMessage: relayData.customerMessage || 'STK Push sent. Enter your M-Pesa PIN.',
+      ResponseCode: '0',
+      ResponseDescription: 'STK Push forwarded to n8n relay.'
+    };
+  }
+
   const config = await getMpesaConfig(env);
   const formattedPhone = formatKenyanPhone(phone);
   const hasCredentials = config.MPESA_CONSUMER_KEY && config.MPESA_CONSUMER_SECRET && config.MPESA_SHORTCODE && config.MPESA_PASSKEY;
@@ -575,6 +603,12 @@ async function route(request, env) {
   }
 
   if (path === '/api/payments/mpesa/callback' && method === 'POST') {
+    if (env.MPESA_MODE === 'n8n' && env.N8N_CALLBACK_SECRET) {
+      const incomingSecret = request.headers.get('x-callback-secret') || '';
+      if (incomingSecret !== env.N8N_CALLBACK_SECRET) {
+        return json({ error: 'Unauthorized' }, 401);
+      }
+    }
     const body = await readJson(request);
     const callbackData = body?.Body?.stkCallback;
     if (!callbackData) return json({ ResultCode: 1, ResultDesc: 'Invalid callback payload' }, 400);
