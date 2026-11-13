@@ -228,7 +228,13 @@ async function initiateMpesaSTKPush(env, request, { orderId, amount, phone, onMo
       const errText = await relayResponse.text();
       throw new Error(`n8n STK relay failed: ${relayResponse.status} ${errText}`);
     }
-    const relayData = await relayResponse.json();
+    let relayData = {};
+    try {
+      const relayText = await relayResponse.text();
+      if (relayText.trim()) relayData = JSON.parse(relayText);
+    } catch {
+      // n8n returned non-JSON — treat as acknowledged, STK push is in flight
+    }
     return {
       CheckoutRequestID: relayData.checkoutRequestId || '',
       CustomerMessage: relayData.customerMessage || 'STK Push sent. Enter your M-Pesa PIN.',
